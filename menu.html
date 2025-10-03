@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekday Menu Formatter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .day {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #007bff;
+            margin-top: 10px;
+        }
+
+        .menu-item {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Enter Your Menu:</h2>
+    <textarea id="inputText" rows="10" cols="50"></textarea>
+    <br>
+    <button onclick="formatText()">Format</button>
+    <h2>Formatted Menu:</h2>
+    <div id="output" style="display: none;"></div>
+    <div id="displayMenu"></div>
+
+    <script>
+        function formatText() {
+            const text = document.getElementById("inputText").value;
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+            const lines = text.split('\n');
+            let outputHTML = "";
+            let currentDay = "";
+        
+            lines.forEach(line => {
+                if (days.includes(line.trim())) {
+                    currentDay = line.trim();
+                    outputHTML += `<div class='day'>${currentDay}</div>`;
+                } else if (currentDay) {
+                    outputHTML += `<div class='menu-item'>${line.trim()}</div>`;
+                }
+            });
+        
+            document.getElementById("output").innerHTML = outputHTML;
+            document.getElementById("displayMenu").innerHTML = 'See formatted menu <a href="https://jysk-helpdesk.mdamsgaard.dk/display_menu.php" target="_blank">here</a>';
+        
+            // Send formatted menu to PHP server
+            fetch("save_menu.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "menu=" + encodeURIComponent(outputHTML)
+            })
+            .then(response => response.text())
+            .then(data => console.log(data))
+            .catch(error => console.error("Error:", error));
+        }
+        </script>        
+</body>
+
+</html>
